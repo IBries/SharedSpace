@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT name="SharedSpace" projectType="audioplug" buildStandalone="1"
+              jucerVersion="5.3.1" pluginFormats="buildVST,buildStandalone"
+              buildVST="1" buildVST3="0" buildAU="0" buildAUv3="0" buildRTAS="0"
+              buildAAX="0" enableIAA="0" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginManufacturer="Absurdist Electronics">
+  <MAINGROUP id="iUNFk2" name="SharedSpace">
+    <GROUP id="{0FEB09F3-4241-A564-3247-DB0FCB4B2F37}" name="Source">
+      <FILE id="yfoTSS" name="SampleSound.h" compile="0" resource="0" file="Source/SampleSound.h"/>
+      <FILE id="iEo1qe" name="SampleVoice.h" compile="0" resource="0" file="Source/SampleVoice.h"/>
+      <FILE id="poqHy1" name="InputStage.cpp" compile="1" resource="0" file="Source/InputStage.cpp"/>
+      <FILE id="Wtp6sD" name="InputStage.h" compile="0" resource="0" file="Source/InputStage.h"/>
+      <FILE id="NaMNM9" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="j0ynR7" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="Xc7W4Q" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="bKZs1u" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
+  <EXPORTFORMATS>
+    <VS2017 targetFolder="Builds/VisualStudio2017">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../_Libraries/C++/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../_Libraries/C++/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2017>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <JUCEOPTIONS/>
+</JUCERPROJECT>
