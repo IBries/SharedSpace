@@ -20,10 +20,14 @@ public:
 		return dynamic_cast<SynthesiserSound*>(sound) != nullptr;
 	}
 
+	//==============================================================================
+
 	void startNote(int midiNoteNumber, float velocity, SynthesiserSound* sound, int currentPitchWheelPosition)
 	{
 		level = velocity;
 	}
+
+	//==============================================================================
 
 	void stopNote(float velocity, bool allowTailOff)
 	{
@@ -31,6 +35,8 @@ public:
 		if (velocity == 0)
 			clearCurrentNote();
 	}
+
+	//==============================================================================
 
 	void renderNextBlock(AudioBuffer<float> &outputBuffer, int startSample, int numSamples)
 	{
@@ -47,15 +53,21 @@ public:
 		}
 	}
 
+	//==============================================================================
+
 	void pitchWheelMoved(int newPitchWheelValue)
 	{
 
 	}
 
+	//==============================================================================
+
 	void controllerMoved(int controllerNumber, int newControllerValue)
 	{
 
 	}
+
+	//==============================================================================
 
 private:
 	double level;

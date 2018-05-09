@@ -12,6 +12,7 @@
 #include "WaveMaker.h"
 
 //==============================================================================
+
 WaveMaker::WaveMaker()
 {
 	addAndMakeVisible(&in1);
@@ -23,6 +24,8 @@ WaveMaker::WaveMaker()
 WaveMaker::~WaveMaker()
 {
 }
+
+//==============================================================================
 
 void WaveMaker::changeListenerCallback(ChangeBroadcaster* source)
 {
@@ -43,15 +46,21 @@ void WaveMaker::changeListenerCallback(ChangeBroadcaster* source)
 	}
 }
 
+//==============================================================================
+
 void WaveMaker::convolve()
 {
-
+	//TODO Convolve buffers
 }
+
+//==============================================================================
 
 void WaveMaker::paint (Graphics& g)
 {
 
 }
+
+//==============================================================================
 
 void WaveMaker::resized()
 {

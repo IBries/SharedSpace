@@ -13,10 +13,13 @@
 
 class SampleSound : public SynthesiserSound
 {
+public:
 	bool appliesToNote(int midiNoteNumber)
 	{
 		return true;
 	}
+
+	//==============================================================================
 
 	bool appliesToChannel(int midiChannel)
 	{

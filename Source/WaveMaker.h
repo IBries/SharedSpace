@@ -14,8 +14,7 @@
 #include "InputStage.h"
 
 //==============================================================================
-/*
-*/
+
 class WaveMaker    : public Component,
 					 public ChangeListener
 {

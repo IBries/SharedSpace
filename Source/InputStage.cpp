@@ -12,6 +12,7 @@
 #include "InputStage.h"
 
 //==============================================================================
+
 InputStage::InputStage()
 	: thumbnailCache(5),
 	  thumbnail (512, formatManager, thumbnailCache)	
@@ -24,6 +25,8 @@ InputStage::~InputStage()
 {
 }
 
+//==============================================================================
+
 void InputStage::paint (Graphics& g)
 {
 	juce::Rectangle<int> thumbnailBounds(0, 0, getWidth(), getHeight());
@@ -34,6 +37,8 @@ void InputStage::paint (Graphics& g)
 		paintIfFileLoaded(g, thumbnailBounds);
 }
 
+//==============================================================================
+
 void InputStage::paintIfNoFileLoaded(Graphics& g, const juce::Rectangle<int>& thumbnailBounds)
 {
 	g.setColour(Colours::darkgrey);
@@ -41,6 +46,8 @@ void InputStage::paintIfNoFileLoaded(Graphics& g, const juce::Rectangle<int>& th
 	g.setColour(Colours::white);
 	g.drawFittedText("No File Loaded", thumbnailBounds, Justification::centred, 1.0f);
 }
+
+//==============================================================================
 
 void InputStage::paintIfFileLoaded(Graphics& g, const juce::Rectangle<int>& thumbnailBounds)
 {
@@ -51,15 +58,21 @@ void InputStage::paintIfFileLoaded(Graphics& g, const juce::Rectangle<int>& thum
 	thumbnail.drawChannels(g, thumbnailBounds, 0.0, thumbnail.getTotalLength(), 1.0f);
 }
 
+//==============================================================================
+
 void InputStage::resized()
 {
 }
+
+//==============================================================================
 
 void InputStage::changeListenerCallback(ChangeBroadcaster *source)
 {
 	if (source == &thumbnail)
 		thumbnailChanged();
 }
+
+//==============================================================================
 
 bool InputStage::isInterestedInFileDrag(const StringArray &files)
 {
@@ -68,6 +81,8 @@ bool InputStage::isInterestedInFileDrag(const StringArray &files)
 	else
 		return true;
 }
+
+//==============================================================================
 
 void InputStage::filesDropped(const StringArray &files, int x, int y)
 {
@@ -87,10 +102,14 @@ void InputStage::filesDropped(const StringArray &files, int x, int y)
 	}
 }
 
+//==============================================================================
+
 void InputStage::thumbnailChanged()
 {
 	repaint();
 }
+
+//==============================================================================
 
 AudioFormatReader* InputStage::getAudioFormatReader()
 {

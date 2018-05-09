@@ -48,6 +48,8 @@ const String SharedSpaceAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
+//==============================================================================
+
 bool SharedSpaceAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
@@ -56,6 +58,8 @@ bool SharedSpaceAudioProcessor::acceptsMidi() const
     return false;
    #endif
 }
+
+//==============================================================================
 
 bool SharedSpaceAudioProcessor::producesMidi() const
 {
@@ -66,6 +70,8 @@ bool SharedSpaceAudioProcessor::producesMidi() const
    #endif
 }
 
+//==============================================================================
+
 bool SharedSpaceAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
@@ -75,10 +81,14 @@ bool SharedSpaceAudioProcessor::isMidiEffect() const
    #endif
 }
 
+//==============================================================================
+
 double SharedSpaceAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
+
+//==============================================================================
 
 int SharedSpaceAudioProcessor::getNumPrograms()
 {
@@ -86,25 +96,34 @@ int SharedSpaceAudioProcessor::getNumPrograms()
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
+//==============================================================================
+
 int SharedSpaceAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
+//==============================================================================
+
 void SharedSpaceAudioProcessor::setCurrentProgram (int index)
 {
 }
+
+//==============================================================================
 
 const String SharedSpaceAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
+//==============================================================================
+
 void SharedSpaceAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
 //==============================================================================
+
 void SharedSpaceAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
 	ignoreUnused(samplesPerBlock);
@@ -112,11 +131,15 @@ void SharedSpaceAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 	synth.setCurrentPlaybackSampleRate(lastSampleRate);
 }
 
+//==============================================================================
+
 void SharedSpaceAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
+
+//==============================================================================
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool SharedSpaceAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -142,6 +165,8 @@ bool SharedSpaceAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
+//==============================================================================
+
 void SharedSpaceAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
 	buffer.clear();
@@ -150,10 +175,13 @@ void SharedSpaceAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 }
 
 //==============================================================================
+
 bool SharedSpaceAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
+
+//==============================================================================
 
 AudioProcessorEditor* SharedSpaceAudioProcessor::createEditor()
 {
@@ -161,12 +189,15 @@ AudioProcessorEditor* SharedSpaceAudioProcessor::createEditor()
 }
 
 //==============================================================================
+
 void SharedSpaceAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
+
+//==============================================================================
 
 void SharedSpaceAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
@@ -175,6 +206,7 @@ void SharedSpaceAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 //==============================================================================
+
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

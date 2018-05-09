@@ -12,6 +12,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
+
 SharedSpaceAudioProcessorEditor::SharedSpaceAudioProcessorEditor (SharedSpaceAudioProcessor& p)
     : AudioProcessorEditor (&p),
 	  processor (p)
@@ -21,14 +22,19 @@ SharedSpaceAudioProcessorEditor::SharedSpaceAudioProcessorEditor (SharedSpaceAud
 	setSize (400, 300);
 }
 
+//==============================================================================
+
 SharedSpaceAudioProcessorEditor::~SharedSpaceAudioProcessorEditor()
 {
 }
 
 //==============================================================================
+
 void SharedSpaceAudioProcessorEditor::paint (Graphics& g)
 {
 }
+
+//==============================================================================
 
 void SharedSpaceAudioProcessorEditor::resized()
 {
