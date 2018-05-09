@@ -12,11 +12,9 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "InputStage.h"
-
+#include "WaveMaker.h"
 //==============================================================================
-/**
-*/
+
 class SharedSpaceAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
@@ -27,16 +25,12 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
-	InputStage* getIn(int inputNumber);
-
-	InputStage in1;
-	InputStage in2;
-
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SharedSpaceAudioProcessor& processor;
 
+	WaveMaker waveMaker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SharedSpaceAudioProcessorEditor)
 };

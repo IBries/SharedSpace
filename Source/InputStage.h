@@ -13,18 +13,17 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 //==============================================================================
-/*
-*/
-class InputStage    : public Component,
-					  public ChangeListener,
-					  public FileDragAndDropTarget
+
+class InputStage : public Component,
+	public ChangeListener,
+	public FileDragAndDropTarget
 {
 public:
-    InputStage();
-    ~InputStage();
+	InputStage();
+	~InputStage();
 
-    void paint (Graphics&) override;
-    void resized() override;
+	void paint(Graphics&) override;
+	void resized() override;
 
 	// Inherited from ChangeListener
 	void changeListenerCallback(ChangeBroadcaster *source);

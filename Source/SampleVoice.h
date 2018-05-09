@@ -38,7 +38,7 @@ public:
 		{
 			double theWave = 0.0 * level; // TODO Input Wave
 
-			for (int channel = 0; channel < outputBuffer.getNumChannels; ++channel)
+			for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
 			{
 				outputBuffer.addSample(channel, startSample, theWave);
 			}
