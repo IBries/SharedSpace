@@ -14,7 +14,7 @@
 //==============================================================================
 InputStage::InputStage()
 	: thumbnailCache(5),
-	  thumbnail (512, formatManager, thumbnailCache)
+	  thumbnail (512, formatManager, thumbnailCache)	
 {
 	formatManager.registerBasicFormats();
 	thumbnail.addChangeListener(this);
@@ -84,6 +84,8 @@ void InputStage::filesDropped(const StringArray &files, int x, int y)
 			thumbnail.setSource(new FileInputSource(audioData));
 			readerSource.reset(newSource.release());
 		}
+
+		sendChangeMessage();
 	}
 }
 

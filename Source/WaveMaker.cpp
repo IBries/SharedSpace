@@ -10,16 +10,36 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WaveMaker.h"
+#include <Windows.h>
 
 //==============================================================================
 WaveMaker::WaveMaker()
 {
 	addAndMakeVisible(&in1);
 	addAndMakeVisible(&in2);
+	in1.addChangeListener(this);
+	in2.addChangeListener(this);
 }
 
 WaveMaker::~WaveMaker()
 {
+}
+
+void WaveMaker::changeListenerCallback(ChangeBroadcaster* source)
+{
+	if (source == &in1)
+	{
+		convolve();
+	}
+	else if (source == &in2)
+	{
+		convolve();
+	}
+}
+
+void WaveMaker::convolve()
+{
+	OutputDebugString("YOU DID IT!");
 }
 
 void WaveMaker::paint (Graphics& g)

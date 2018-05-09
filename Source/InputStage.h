@@ -15,6 +15,7 @@
 //==============================================================================
 
 class InputStage : public Component,
+	public ChangeBroadcaster,
 	public ChangeListener,
 	public FileDragAndDropTarget
 {

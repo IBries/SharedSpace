@@ -16,7 +16,8 @@
 //==============================================================================
 /*
 */
-class WaveMaker    : public Component
+class WaveMaker    : public Component,
+					 public ChangeListener
 {
 public:
     WaveMaker();
@@ -25,9 +26,14 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+	void changeListenerCallback(ChangeBroadcaster*);
+	void convolve();
+
 private:
 	InputStage in1;
 	InputStage in2;
+
+	dsp::Convolution convolution;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveMaker)
 };
