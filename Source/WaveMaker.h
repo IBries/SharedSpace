@@ -29,11 +29,13 @@ public:
 	void changeListenerCallback(ChangeBroadcaster*);
 	void convolve();
 
+
 private:
 	InputStage in1;
 	InputStage in2;
 
-	dsp::Convolution convolution;
+	AudioBuffer<float> buffer1;
+	AudioBuffer<float> buffer2;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveMaker)
 };

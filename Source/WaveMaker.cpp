@@ -10,7 +10,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WaveMaker.h"
-#include <Windows.h>
 
 //==============================================================================
 WaveMaker::WaveMaker()
@@ -27,39 +26,31 @@ WaveMaker::~WaveMaker()
 
 void WaveMaker::changeListenerCallback(ChangeBroadcaster* source)
 {
-	if (source == &in1)
+	AudioFormatReader* reader;
+	if (source == &in1 && &in2 != nullptr)
 	{
+		reader = in1.getAudioFormatReader();
+		buffer1.setSize(reader->numChannels, reader->lengthInSamples);
+		reader->read(&buffer1, 0, reader->lengthInSamples, 0, true, true);
 		convolve();
 	}
-	else if (source == &in2)
+	else if (source == &in2 && &in1 != nullptr)
 	{
+		reader = in2.getAudioFormatReader();
+		buffer2.setSize(reader->numChannels, reader->lengthInSamples);
+		reader->read(&buffer2, 0, reader->lengthInSamples, 0, true, true);
 		convolve();
 	}
 }
 
 void WaveMaker::convolve()
 {
-	OutputDebugString("YOU DID IT!");
+
 }
 
 void WaveMaker::paint (Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
 
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour (Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("WaveMaker", getLocalBounds(),
-                Justification::centred, true);   // draw some placeholder text
 }
 
 void WaveMaker::resized()

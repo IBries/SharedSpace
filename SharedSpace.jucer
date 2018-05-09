@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT name="SharedSpace" projectType="audioplug" buildStandalone="1"
-              jucerVersion="5.3.1" pluginFormats="buildVST,buildStandalone"
+              jucerVersion="5.3.2" pluginFormats="buildVST,buildStandalone"
               buildVST="1" buildVST3="0" buildAU="0" buildAUv3="0" buildRTAS="0"
               buildAAX="0" enableIAA="0" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginManufacturer="Absurdist Electronics">
+              pluginManufacturer="Absurdist Electronics" id="n6qVPo">
   <MAINGROUP id="iUNFk2" name="SharedSpace">
     <GROUP id="{0FEB09F3-4241-A564-3247-DB0FCB4B2F37}" name="Source">
+      <FILE id="wBoBwZ" name="WaveMaker.cpp" compile="1" resource="0" file="Source/WaveMaker.cpp"/>
+      <FILE id="x0oOM5" name="WaveMaker.h" compile="0" resource="0" file="Source/WaveMaker.h"/>
       <FILE id="yfoTSS" name="SampleSound.h" compile="0" resource="0" file="Source/SampleSound.h"/>
       <FILE id="iEo1qe" name="SampleVoice.h" compile="0" resource="0" file="Source/SampleVoice.h"/>
       <FILE id="poqHy1" name="InputStage.cpp" compile="1" resource="0" file="Source/InputStage.cpp"/>

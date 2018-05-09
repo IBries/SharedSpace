@@ -53,8 +53,6 @@ void InputStage::paintIfFileLoaded(Graphics& g, const juce::Rectangle<int>& thum
 
 void InputStage::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
 }
 
 void InputStage::changeListenerCallback(ChangeBroadcaster *source)
