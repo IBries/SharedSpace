@@ -26,8 +26,6 @@ public:
     void resized() override;
 
 	void changeListenerCallback(ChangeBroadcaster*);
-	void convolve();
-
 
 private:
 	InputStage in1;
@@ -35,6 +33,11 @@ private:
 
 	AudioBuffer<float> buffer1;
 	AudioBuffer<float> buffer2;
+	AudioBuffer<float> output;
+
+	void initializeOutputBuffer();
+	void convolve();
+	void convolve(float*, float*, float*);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveMaker)
 };
