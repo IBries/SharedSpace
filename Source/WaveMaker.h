@@ -35,7 +35,16 @@ private:
 	AudioBuffer<float> buffer2;
 	AudioBuffer<float> output;
 
-	void initializeOutputBuffer();
+	// FFT Implementation
+	enum
+	{
+		fftOrder = 10,
+		fftSize = 1 << fftOrder
+	};
+	dsp::FFT fft;
+
+
+	void initializeOutputBuffer(bool);
 	void convolve();
 	void convolve(float*, float*, float*);
 

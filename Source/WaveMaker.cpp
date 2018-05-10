@@ -10,15 +10,16 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WaveMaker.h"
+#include	<Windows.h>
 
 //==============================================================================
 
-WaveMaker::WaveMaker() :
-	buffer1(2, 512),
-	buffer2(2, 512)
+WaveMaker::WaveMaker()
+	: fft(fftOrder)
 {
 	buffer1.clear();
 	buffer2.clear();
+	output.clear();
 
 	addAndMakeVisible(&in1);
 	addAndMakeVisible(&in2);
@@ -40,52 +41,90 @@ void WaveMaker::changeListenerCallback(ChangeBroadcaster* source)
 		reader = in1.getAudioFormatReader();
 		buffer1 = AudioBuffer<float>(reader->numChannels, reader->lengthInSamples);
 		reader->read(&buffer1, 0, reader->lengthInSamples, 0, true, true);
+		initializeOutputBuffer(true);
 	}
 	else if (source == &in2)
 	{
 		reader = in2.getAudioFormatReader();
 		buffer2 = AudioBuffer<float>(reader->numChannels, reader->lengthInSamples);
 		reader->read(&buffer2, 0, reader->lengthInSamples, 0, true, true);
+		initializeOutputBuffer(false);
 	}
-
-	initializeOutputBuffer();
-	convolve();
+	if (buffer1.getNumChannels() == 2 && buffer2.getNumChannels() == 2)
+	{
+		convolve();
+	}
+	if (output.getMagnitude(0, output.getNumSamples()) != 0.0)
+	{
+		OutputDebugString("Output buffer contains data; hopefully it's correct or at least cool");
+	}
 }
 
 //==============================================================================
 
-void WaveMaker::initializeOutputBuffer()
+void WaveMaker::initializeOutputBuffer(bool isBufferOne)
 {
-	output = AudioBuffer<float>(2, buffer1.getNumSamples() + buffer2.getNumSamples() - 1);
+	int numChannels;
+	if (isBufferOne)
+	{
+		numChannels = buffer1.getNumChannels();
+	}
+	else
+	{
+		numChannels = buffer2.getNumChannels();
+	}
+	output = AudioBuffer<float>(numChannels, buffer1.getNumSamples() + buffer2.getNumSamples() - 1);
+	output.clear();
+
 }
 
 //==============================================================================
 
 void WaveMaker::convolve()
 {
-	if (&buffer1 != nullptr && &buffer2 != nullptr)
+	// Pads both buffers with zeros in preparation for FFT
+	int padSize = buffer1.getNumSamples() + buffer2.getNumSamples() - 1;
+	buffer1.setSize(buffer1.getNumChannels(), padSize, true, true, false);
+	buffer2.setSize(buffer2.getNumChannels(), padSize, true, true, false);
+
+	for (int channelNumber = 0; channelNumber < 2; ++channelNumber)
 	{
-		for (int channelNumber = 0; channelNumber < 2; ++channelNumber)
+		
+		// Upper bound ignores last bucket, which will most likely not be large enough for FFT.
+		// The last bucket is most likely zeros anyway, so it shouldn't matter.
+		for (int sampleNumber = 0; sampleNumber < buffer1.getNumSamples() - 2*fft.getSize(); sampleNumber += fft.getSize())
 		{
-			auto* outptr = (float*) output.getWritePointer(channelNumber);
-			auto* in1ptr = (float*) buffer1.getReadPointer(channelNumber);
-			auto* in2ptr = (float*) buffer2.getReadPointer(channelNumber);
-			convolve(outptr, in1ptr, in2ptr);
+			AudioBuffer<float> bucket1 = AudioBuffer<float>(1, 2 * fft.getSize());
+			bucket1.addFrom(0, 0, buffer1, channelNumber, sampleNumber, fft.getSize());
+			auto* bucket1ptr = (float*)bucket1.getWritePointer(0);
+
+			AudioBuffer<float> bucket2 = AudioBuffer<float>(1, 2 * fft.getSize());
+			bucket2.addFrom(0, 0, buffer2, channelNumber, sampleNumber, fft.getSize());
+			auto* bucket2ptr = (float*)bucket2.getWritePointer(0);
+
+			AudioBuffer<float> outputBucket = AudioBuffer<float>(1, 2 * fft.getSize());
+			outputBucket.clear();
+			auto* outputBucketptr = (float*)outputBucket.getWritePointer(0);
+
+			convolve(outputBucketptr, bucket1ptr, bucket2ptr);
+
+			output.addFrom(channelNumber, sampleNumber, outputBucket, 0, 0, outputBucket.getNumSamples());
 		}
 	}
+
 }
 
-void WaveMaker::convolve(float* outptr, float* in1ptr, float* in2ptr)
+void WaveMaker::convolve(float* outputBucketptr, float* bucket1ptr, float* bucket2ptr)
 {
-	//TODO Re-implement using FFT
-	for (int i = 0; i < buffer1.getNumSamples(); ++i)
+	fft.performRealOnlyForwardTransform(bucket1ptr);
+	fft.performRealOnlyForwardTransform(bucket2ptr);
+
+	for (int i = 0; i < 2*fft.getSize(); ++i)
 	{
-		outptr[i] = 0;
-		for (int j = 0; j < buffer2.getNumSamples(); ++j)
-		{
-			outptr[i] += in1ptr[i - j] * in2ptr[j];
-		}
+		outputBucketptr[i] = bucket1ptr[i] * bucket2ptr[i];
 	}
+
+	fft.performRealOnlyInverseTransform(outputBucketptr);
 }
 
 //==============================================================================
