@@ -43,6 +43,9 @@ private:
 	};
 	dsp::FFT fft;
 
+	int dialDiameter;
+	Slider rootNoteSlider;
+	Slider positionSlider;
 
 	void initializeOutputBuffer(bool);
 	void convolve();

@@ -15,7 +15,8 @@
 //==============================================================================
 
 WaveMaker::WaveMaker()
-	: fft(fftOrder)
+	: fft(fftOrder),
+	  dialDiameter(60)
 {
 	buffer1.clear();
 	buffer2.clear();
@@ -25,6 +26,17 @@ WaveMaker::WaveMaker()
 	addAndMakeVisible(&in2);
 	in1.addChangeListener(this);
 	in2.addChangeListener(this);
+
+	addAndMakeVisible(&rootNoteSlider);
+	rootNoteSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+	rootNoteSlider.setTextBoxStyle(Slider::TextBoxBelow, false, rootNoteSlider.getTextBoxWidth(), rootNoteSlider.getTextBoxHeight());
+	rootNoteSlider.setRange(0, 127, 1);
+	rootNoteSlider.setValue(60);
+	addAndMakeVisible(&positionSlider);
+	positionSlider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+	positionSlider.setTextBoxStyle(Slider::TextBoxBelow, false, positionSlider.getTextBoxWidth(), positionSlider.getTextBoxHeight());
+	positionSlider.setRange(0, 100, 0.1);
+	positionSlider.setValue(50);
 }
 
 WaveMaker::~WaveMaker()
@@ -138,6 +150,8 @@ void WaveMaker::paint (Graphics& g)
 
 void WaveMaker::resized()
 {
-	in1.setBounds(0, 0, getWidth(), getHeight() / 2);
-	in2.setBounds(0, getHeight() / 2, getWidth(), getHeight() / 2);
+	in1.setBounds(0, 0, getWidth() - dialDiameter, getHeight() / 2);
+	in2.setBounds(0, getHeight() / 2, getWidth() - dialDiameter, getHeight() / 2);
+	rootNoteSlider.setBounds(getWidth() - dialDiameter, 0, dialDiameter, getHeight() / 2);
+	positionSlider.setBounds(getWidth() - dialDiameter, getHeight() / 2, dialDiameter, getHeight() / 2);
 }
