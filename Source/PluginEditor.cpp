@@ -38,5 +38,5 @@ void SharedSpaceAudioProcessorEditor::paint (Graphics& g)
 
 void SharedSpaceAudioProcessorEditor::resized()
 {
-	waveMaker.setBounds(0, 0, getWidth() / 2, getHeight() / 2);
+	waveMaker.setBounds(0, 0, getWidth(), getHeight());
 }

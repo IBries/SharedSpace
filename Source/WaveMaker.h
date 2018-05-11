@@ -31,6 +31,11 @@ private:
 	InputStage in1;
 	InputStage in2;
 
+	AudioFormatManager formatManager;
+	std::unique_ptr<AudioFormatReaderSource> readerSource;
+	AudioThumbnailCache thumbnailCache;
+	AudioThumbnail outputThumbnail;
+
 	AudioBuffer<float> buffer1;
 	AudioBuffer<float> buffer2;
 	AudioBuffer<float> output;
@@ -47,9 +52,18 @@ private:
 	Slider rootNoteSlider;
 	Slider positionSlider;
 
+	File outputFile;
+	WavAudioFormat wavFormat;
+	int outputSampleRate;
+	void outputThumbnailChanged();
+	void paintIfNoFileLoaded(Graphics&, const Rectangle<int>&);
+	void paintIfFileLoaded(Graphics&, const Rectangle<int>&);
+
 	void initializeOutputBuffer(bool);
 	void convolve();
 	void convolve(float*, float*, float*);
+	void writeOutputToDisk();
+	void displayOutputBuffer();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveMaker)
 };

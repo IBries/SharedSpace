@@ -36,11 +36,11 @@ public:
 	AudioFormatReader* getAudioFormatReader();
 
 private:
-	AudioThumbnail thumbnail;
+	AudioThumbnailCache thumbnailCache;
 	AudioFormatManager formatManager;
+	AudioThumbnail thumbnail;
 	AudioFormatReader* reader;
 	std::unique_ptr<AudioFormatReaderSource> readerSource;
-	AudioThumbnailCache thumbnailCache;
 	File audioData;
 
 	void thumbnailChanged();
