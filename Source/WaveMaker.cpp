@@ -103,35 +103,38 @@ void WaveMaker::initializeOutputBuffer(bool isBufferOne)
 
 void WaveMaker::convolve()
 {
-	if (buffer1.getNumChannels() == 2 && buffer2.getNumChannels() == 2)
+	if (buffer1.getNumChannels() ==  buffer2.getNumChannels())
 	{
-		// Pads both buffers with zeros in preparation for FFT
-		int padSize = buffer1.getNumSamples() + buffer2.getNumSamples() - 1;
-		buffer1.setSize(buffer1.getNumChannels(), padSize, true, true, false);
-		buffer2.setSize(buffer2.getNumChannels(), padSize, true, true, false);
+		// Pad buffers so we can split them both into n buckets, where n is an integer
+		int newTotalNumSamples = calculatePaddedBufferSize();
+		buffer1.setSize(buffer1.getNumChannels(), newTotalNumSamples, true, true, false);
+		buffer2.setSize(buffer2.getNumChannels(), newTotalNumSamples, true, true, false);
 
-		for (int channelNumber = 0; channelNumber < 2; ++channelNumber)
+		for (int channel = 0; channel < buffer1.getNumChannels(); ++channel)
 		{
-
-			// Upper bound ignores last bucket, which will most likely not be large enough for FFT.
-			// The last bucket is most likely zeros anyway, so it shouldn't matter.
-			for (int sampleNumber = 0; sampleNumber < buffer1.getNumSamples() - 2 * fft.getSize(); sampleNumber += fft.getSize())
+			for (int sample = 0; sample < buffer1.getNumSamples(); sample += fft.getSize())
 			{
-				AudioBuffer<float> bucket1 = AudioBuffer<float>(1, 2 * fft.getSize());
-				bucket1.addFrom(0, 0, buffer1, channelNumber, sampleNumber, fft.getSize());
-				auto* bucket1ptr = (float*)bucket1.getWritePointer(0);
-
-				AudioBuffer<float> bucket2 = AudioBuffer<float>(1, 2 * fft.getSize());
-				bucket2.addFrom(0, 0, buffer2, channelNumber, sampleNumber, fft.getSize());
-				auto* bucket2ptr = (float*)bucket2.getWritePointer(0);
-
-				AudioBuffer<float> outputBucket = AudioBuffer<float>(1, 2 * fft.getSize());
+				AudioBuffer<float> buffer1Bucket = createBucket(buffer1, channel, sample, fft.getSize());
+				AudioBuffer<float> buffer2Bucket = createBucket(buffer2, channel, sample, fft.getSize());
+				AudioBuffer<float> outputBucket = AudioBuffer<float>(buffer1Bucket.getNumChannels(), 2 *fft.getSize());
 				outputBucket.clear();
-				auto* outputBucketptr = (float*)outputBucket.getWritePointer(0);
 
-				convolve(outputBucketptr, bucket1ptr, bucket2ptr);
+				// Pad Buckets with zeros
+				buffer1Bucket.setSize(buffer1Bucket.getNumChannels(), 2 * fft.getSize(), true, true, false);
+				buffer2Bucket.setSize(buffer2Bucket.getNumChannels(), 2 * fft.getSize(), true, true, false);
 
-				output.addFrom(channelNumber, sampleNumber, outputBucket, 0, 0, outputBucket.getNumSamples());
+				auto* buffer1BucketPtr = buffer1Bucket.getWritePointer(0);
+				auto* buffer2BucketPtr = buffer2Bucket.getWritePointer(0);
+				auto* outputBucketPtr = outputBucket.getWritePointer(0);
+
+				fft.performRealOnlyForwardTransform(buffer1BucketPtr);
+				fft.performRealOnlyForwardTransform(buffer2BucketPtr);
+
+				multiplyBucketsFrequencyDomain(buffer1BucketPtr, buffer2BucketPtr, outputBucketPtr);
+
+				fft.performRealOnlyInverseTransform(outputBucketPtr);
+
+				output.copyFrom(channel, sample, outputBucket, 0, 0, fft.getSize());
 			}
 		}
 
@@ -139,6 +142,8 @@ void WaveMaker::convolve()
 		displayOutputBuffer();
 	}
 }
+
+//==============================================================================
 
 void WaveMaker::convolve(float* outputBucketptr, float* bucket1ptr, float* bucket2ptr)
 {
@@ -155,9 +160,61 @@ void WaveMaker::convolve(float* outputBucketptr, float* bucket1ptr, float* bucke
 
 //==============================================================================
 
+int WaveMaker::calculatePaddedBufferSize()
+{
+	int sizeOfLargerBuffer;
+	if (buffer1.getNumSamples() >= buffer2.getNumSamples())
+	{
+		sizeOfLargerBuffer = buffer1.getNumSamples();
+	}
+	else
+	{
+		sizeOfLargerBuffer = buffer2.getNumSamples();
+	}
+
+
+	while (sizeOfLargerBuffer % fft.getSize() != 0)
+	{
+		sizeOfLargerBuffer++;
+	}
+	return sizeOfLargerBuffer;
+}
+
+//==============================================================================
+
+AudioBuffer<float> WaveMaker::createBucket(AudioBuffer<float> source, int channel, int startSample, int bucketSize)
+{
+	jassert(channel < source.getNumChannels() && channel >= 0);
+	
+	AudioBuffer<float> bucket = AudioBuffer<float>(1, fft.getSize());
+	bucket.clear();
+	
+	bucket.copyFrom(0, 0, source, channel, startSample, bucketSize);
+
+	return bucket;
+}
+
+//==============================================================================
+
+void WaveMaker::multiplyBucketsFrequencyDomain(float* in1, float* in2, float* output)
+{
+	for (int i = 0; i < 2 * fft.getSize(); i += 2)
+	{
+		std::complex<float> val1 = std::complex<float>(in1[i], in1[i+1]);
+		std::complex<float> val2 = std::complex<float>(in2[i], in2[i+1]);
+		std::complex<float> out = val1 * val2;
+
+		output[i] = std::real(out);
+		output[i+1] = std::imag(out);
+	}
+}
+
+//==============================================================================
+
 void WaveMaker::writeOutputToDisk()
 {
-	outputFile = File("C:/Users/Isaac/_Development/C++/SharedSpace/ConvolutionOutput.wav");
+	String filePath = File::getCurrentWorkingDirectory().getFullPathName();
+	outputFile = File(filePath + "\\ConvolutionOutput.wav");
 	FileOutputStream* outputTo = outputFile.createOutputStream();
 	AudioFormatWriter* writer = wavFormat.createWriterFor(outputTo, 44100, output.getNumChannels(), 16, NULL, 0);
 	writer->writeFromAudioSampleBuffer(output, 0, output.getNumSamples());

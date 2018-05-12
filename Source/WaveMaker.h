@@ -59,6 +59,9 @@ private:
 	void paintIfNoFileLoaded(Graphics&, const Rectangle<int>&);
 	void paintIfFileLoaded(Graphics&, const Rectangle<int>&);
 
+	int calculatePaddedBufferSize();
+	AudioBuffer<float> createBucket(AudioBuffer<float>, int, int, int);
+	void multiplyBucketsFrequencyDomain(float*, float*, float*);
 	void initializeOutputBuffer(bool);
 	void convolve();
 	void convolve(float*, float*, float*);
