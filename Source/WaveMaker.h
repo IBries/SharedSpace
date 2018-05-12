@@ -53,7 +53,7 @@ private:
 	Slider positionSlider;
 
 	File outputFile;
-	WavAudioFormat wavFormat;
+	WavAudioFormat* wavFormat;
 	int outputSampleRate;
 	void outputThumbnailChanged();
 	void paintIfNoFileLoaded(Graphics&, const Rectangle<int>&);
