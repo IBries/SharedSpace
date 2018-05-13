@@ -14,8 +14,7 @@
 //==============================================================================
 
 WaveMaker::WaveMaker()
-	: fft(fftOrder),
-	  dialDiameter(60),
+	: dialDiameter(60),
 	  thumbnailCache(5),
 	  outputThumbnail(512, formatManager, thumbnailCache)
 {
@@ -57,16 +56,14 @@ void WaveMaker::changeListenerCallback(ChangeBroadcaster* source)
 		reader = in1.getAudioFormatReader();
 		buffer1 = AudioBuffer<float>(reader->numChannels, reader->lengthInSamples);
 		reader->read(&buffer1, 0, reader->lengthInSamples, 0, true, true);
-		initializeOutputBuffer(true);
-		convolve();
+		createAndDisplayOutput();
 	}
 	else if (source == &in2)
 	{
 		reader = in2.getAudioFormatReader();
 		buffer2 = AudioBuffer<float>(reader->numChannels, reader->lengthInSamples);
 		reader->read(&buffer2, 0, reader->lengthInSamples, 0, true, true);
-		initializeOutputBuffer(false);
-		convolve();
+		createAndDisplayOutput();
 	}
 	else if (source == &outputThumbnail)
 	{
@@ -83,64 +80,29 @@ void WaveMaker::outputThumbnailChanged()
 
 //==============================================================================
 
-void WaveMaker::initializeOutputBuffer(bool isBufferOne)
-{
-	int numChannels;
-	if (isBufferOne)
-	{
-		numChannels = buffer1.getNumChannels();
-	}
-	else
-	{
-		numChannels = buffer2.getNumChannels();
-	}
-	output = AudioBuffer<float>(numChannels, buffer1.getNumSamples() + buffer2.getNumSamples() - 1);
-	output.clear();
-
-}
-
-//==============================================================================
-
-void WaveMaker::convolve()
+void WaveMaker::createAndDisplayOutput()
 {
 	if (buffer1.getNumChannels() ==  buffer2.getNumChannels())
 	{
-		// Pad buffers so we can split them both into n buckets, where n is an integer
-		int newTotalNumSamples = calculatePaddedBufferSize();
-		buffer1.setSize(buffer1.getNumChannels(), newTotalNumSamples, true, true, false);
-		buffer2.setSize(buffer2.getNumChannels(), newTotalNumSamples, true, true, false);
+		int fftSize = calculateFFTSize(buffer1.getNumSamples(), buffer2.getNumSamples());
+		int fftOrder = log2(fftSize);
 
+		padBuffersWithZeros(2 * fftSize);
+		initializeOutputBuffer(2 * fftSize);
+		
 		for (int channel = 0; channel < buffer1.getNumChannels(); ++channel)
 		{
-			for (int sample = 0; sample < buffer1.getNumSamples(); sample += fft.getSize())
-			{
-				AudioBuffer<float> buffer1Bucket = createBucket(buffer1, channel, sample, fft.getSize());
-				AudioBuffer<float> buffer2Bucket = createBucket(buffer2, channel, sample, fft.getSize());
-				AudioBuffer<float> outputBucket = AudioBuffer<float>(buffer1Bucket.getNumChannels(), 2 *fft.getSize());
-				outputBucket.clear();
+			splitBuffersIntoChannels(channel, 2 * fftSize);
+			auto* buffer1SingleChannelPtr = buffer1SingleChannel.getWritePointer(0);
+			auto* buffer2SingleChannelPtr = buffer2SingleChannel.getWritePointer(0);
+			auto* outputSingleChannelPtr = outputSingleChannel.getWritePointer(0);
 
-				// Pad Buckets with zeros
-				buffer1Bucket.setSize(buffer1Bucket.getNumChannels(), 2 * fft.getSize(), true, true, false);
-				buffer2Bucket.setSize(buffer2Bucket.getNumChannels(), 2 * fft.getSize(), true, true, false);
+			convolve(buffer1SingleChannelPtr, buffer2SingleChannelPtr, outputSingleChannelPtr, fftOrder);
 
-				auto* buffer1BucketPtr = buffer1Bucket.getWritePointer(0);
-				auto* buffer2BucketPtr = buffer2Bucket.getWritePointer(0);
-				auto* outputBucketPtr = outputBucket.getWritePointer(0);
-
-				fft.performRealOnlyForwardTransform(buffer1BucketPtr);
-				fft.performRealOnlyForwardTransform(buffer2BucketPtr);
-
-				multiplyBucketsFrequencyDomain(buffer1BucketPtr, buffer2BucketPtr, outputBucketPtr);
-
-				fft.performRealOnlyInverseTransform(outputBucketPtr);
-
-				output.copyFrom(channel, sample, outputBucket, 0, 0, fft.getSize());
-			}
+			output.copyFrom(channel, 0, outputSingleChannelPtr, outputSingleChannel.getNumSamples() / 2);
 		}
 
-		// Normalize Output
-		output.applyGain(0.8 / output.getMagnitude(0, output.getNumSamples()));
-
+		processOutput();
 		writeOutputToDisk();
 		displayOutputBuffer();
 	}
@@ -148,68 +110,84 @@ void WaveMaker::convolve()
 
 //==============================================================================
 
-void WaveMaker::convolve(float* outputBucketptr, float* bucket1ptr, float* bucket2ptr)
+int WaveMaker::calculateFFTSize(int length1, int length2)
 {
-	fft.performRealOnlyForwardTransform(bucket1ptr);
-	fft.performRealOnlyForwardTransform(bucket2ptr);
-
-	for (int i = 0; i < 2*fft.getSize(); ++i)
-	{
-		outputBucketptr[i] = bucket1ptr[i] * bucket2ptr[i];
-	}
-
-	fft.performRealOnlyInverseTransform(outputBucketptr);
-}
-
-//==============================================================================
-
-int WaveMaker::calculatePaddedBufferSize()
-{
-	int sizeOfLargerBuffer;
-	if (buffer1.getNumSamples() >= buffer2.getNumSamples())
-	{
-		sizeOfLargerBuffer = buffer1.getNumSamples();
-	}
-	else
-	{
-		sizeOfLargerBuffer = buffer2.getNumSamples();
-	}
-
-
-	while (sizeOfLargerBuffer % fft.getSize() != 0)
-	{
-		sizeOfLargerBuffer++;
-	}
-	return sizeOfLargerBuffer;
-}
-
-//==============================================================================
-
-AudioBuffer<float> WaveMaker::createBucket(AudioBuffer<float> source, int channel, int startSample, int bucketSize)
-{
-	jassert(channel < source.getNumChannels() && channel >= 0);
+	int fftSize = 1;
 	
-	AudioBuffer<float> bucket = AudioBuffer<float>(1, fft.getSize());
-	bucket.clear();
-	
-	bucket.copyFrom(0, 0, source, channel, startSample, bucketSize);
+	// Finds the smallest power of 2 larger than the size of the convolution
+	while (fftSize <= length1 + length2 - 1)
+	{
+		fftSize = fftSize << 1;
+	}
 
-	return bucket;
+	return fftSize;	
 }
 
 //==============================================================================
 
-void WaveMaker::multiplyBucketsFrequencyDomain(float* in1, float* in2, float* output)
+void WaveMaker::padBuffersWithZeros(int newSize)
 {
-	for (int i = 0; i < 2 * fft.getSize(); i += 2)
-	{
-		std::complex<float> val1 = std::complex<float>(in1[i], in1[i+1]);
-		std::complex<float> val2 = std::complex<float>(in2[i], in2[i+1]);
-		std::complex<float> out = val1 * val2;
+	buffer1.setSize(buffer1.getNumChannels(), newSize, true, true);
+	buffer2.setSize(buffer2.getNumChannels(), newSize, true, true);
+}
 
-		output[i] = std::real(out);
-		output[i+1] = std::imag(out);
+//==============================================================================
+
+void WaveMaker::initializeOutputBuffer(int size)
+{
+	output = AudioBuffer<float>(buffer1.getNumChannels(), size / 2);
+	outputSingleChannel = AudioBuffer<float>(1, size);
+}
+
+//==============================================================================
+
+void WaveMaker::splitBuffersIntoChannels(int channel, int size)
+{
+	buffer1SingleChannel = AudioBuffer<float>(1, size);
+	buffer2SingleChannel = AudioBuffer<float>(1, size);
+
+	buffer1SingleChannel.copyFrom(0, 0, buffer1, channel, 0, size);
+	buffer2SingleChannel.copyFrom(0, 0, buffer2, channel, 0, size);
+}
+
+//==============================================================================
+
+void WaveMaker::convolve(float* in1, float* in2, float* out, int order)
+{
+	dsp::FFT fft(order);
+
+	fft.performRealOnlyForwardTransform(in1);
+	fft.performRealOnlyForwardTransform(in2);
+
+	complexMultiply(in1, in2, out, fft.getSize());
+
+	fft.performRealOnlyInverseTransform(out);
+}
+
+//==============================================================================
+
+void WaveMaker::complexMultiply(float* in1, float* in2, float* out, int length)
+{
+	for (int i = 0; i < 2 * length - 1; ++i)
+	{
+		std::complex<float> complex1(in1[i], in2[i + 1]);
+		std::complex<float> complex2(in2[i], in2[i + 1]);
+		std::complex<float> complexOut = complex1 * complex2;
+
+		out[i] = complexOut.real();
+		out[i + 1] = complexOut.imag();
 	}
+}
+
+//==============================================================================
+
+void WaveMaker::processOutput()
+{
+	float fadeLength = 0.01;
+	int fadeLengthInSamples = 44100 * fadeLength;
+	output.applyGainRamp(0, fadeLengthInSamples, 0, 1);
+	output.applyGainRamp(output.getNumSamples() - fadeLengthInSamples, fadeLengthInSamples, 1, 0);
+	output.applyGain(0.8 / output.getMagnitude(0, output.getNumSamples()));
 }
 
 //==============================================================================

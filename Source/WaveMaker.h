@@ -37,20 +37,23 @@ private:
 	AudioThumbnail outputThumbnail;
 
 	AudioBuffer<float> buffer1;
+	AudioBuffer<float> buffer1SingleChannel;
 	AudioBuffer<float> buffer2;
+	AudioBuffer<float> buffer2SingleChannel;
 	AudioBuffer<float> output;
-
-	// FFT Implementation
-	enum
-	{
-		fftOrder = 10,
-		fftSize = 1 << fftOrder
-	};
-	dsp::FFT fft;
+	AudioBuffer<float> outputSingleChannel;
 
 	int dialDiameter;
 	Slider rootNoteSlider;
 	Slider positionSlider;
+
+	int calculateFFTSize(int, int);
+	void padBuffersWithZeros(int);
+	void initializeOutputBuffer(int);
+	void splitBuffersIntoChannels(int, int);
+	void convolve(float*, float*, float*, int);
+	void complexMultiply(float*, float*, float*, int);
+	void processOutput();
 
 	File outputFile;
 	WavAudioFormat* wavFormat;
@@ -59,12 +62,7 @@ private:
 	void paintIfNoFileLoaded(Graphics&, const Rectangle<int>&);
 	void paintIfFileLoaded(Graphics&, const Rectangle<int>&);
 
-	int calculatePaddedBufferSize();
-	AudioBuffer<float> createBucket(AudioBuffer<float>, int, int, int);
-	void multiplyBucketsFrequencyDomain(float*, float*, float*);
-	void initializeOutputBuffer(bool);
-	void convolve();
-	void convolve(float*, float*, float*);
+	void createAndDisplayOutput();
 	void writeOutputToDisk();
 	void displayOutputBuffer();
 
