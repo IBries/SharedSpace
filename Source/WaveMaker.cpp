@@ -44,6 +44,7 @@ WaveMaker::WaveMaker()
 
 WaveMaker::~WaveMaker()
 {
+	outputFile.deleteFile();
 }
 
 //==============================================================================
@@ -194,6 +195,8 @@ void WaveMaker::processOutput()
 
 void WaveMaker::writeOutputToDisk()
 {
+	outputFile.deleteFile(); // Currently isn't working
+
 	wavFormat = new WavAudioFormat();
 
 	String filePath = File::getCurrentWorkingDirectory().getFullPathName();
@@ -201,7 +204,8 @@ void WaveMaker::writeOutputToDisk()
 	FileOutputStream* outputTo = outputFile.createOutputStream();
 	AudioFormatWriter* writer = wavFormat->createWriterFor(outputTo, 44100, output.getNumChannels(), 16, NULL, 0);
 	writer->writeFromAudioSampleBuffer(output, 0, output.getNumSamples());
-	delete writer;
+	delete writer; // Not ideal, but I don't feel like implementing scoped pointers right now
+	delete wavFormat; // Not ideal, but I don't feel like implementing scoped pointers right now
 }
 
 //==============================================================================
