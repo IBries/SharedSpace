@@ -1,4 +1,8 @@
 ![Logo of the project](https://github.com/IBries/SharedSpace/blob/master/logo.png)
+![Logo of the project](https://github.com/IBries/SharedSpace/blob/master/logo.png)
+![Logo of the project](https://github.com/IBries/SharedSpace/blob/master/logo.png)
+![Logo of the project](https://github.com/IBries/SharedSpace/blob/master/logo.png)
+![Logo of the project](https://github.com/IBries/SharedSpace/blob/master/logo.png)
 
 # Shared Space
 > a convolutional sampler
