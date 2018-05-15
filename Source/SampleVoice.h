@@ -9,7 +9,9 @@
 */
 
 #pragma once
+
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "SampleSound.h"
 #include <Windows.h>
 
 class SampleVoice : public SynthesiserVoice
@@ -24,33 +26,23 @@ public:
 
 	void startNote(int midiNoteNumber, float velocity, SynthesiserSound* sound, int currentPitchWheelPosition)
 	{
-		level = velocity;
+		frequency = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
+		LPCSTR msg = "" + midiNoteNumber;
+		OutputDebugString(msg);
 	}
 
 	//==============================================================================
 
 	void stopNote(float velocity, bool allowTailOff)
 	{
-		allowTailOff = true;
-		if (velocity == 0)
-			clearCurrentNote();
+		clearCurrentNote();
 	}
 
 	//==============================================================================
 
 	void renderNextBlock(AudioBuffer<float> &outputBuffer, int startSample, int numSamples)
 	{
-		for (int sample = 0; sample < numSamples; ++sample)
-		{
-			double theWave = 0.0 * level; // TODO Input Wave
 
-			for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
-			{
-				outputBuffer.addSample(channel, startSample, theWave);
-			}
-
-			++startSample;
-		}
 	}
 
 	//==============================================================================
@@ -71,4 +63,5 @@ public:
 
 private:
 	double level;
+	double frequency;
 };

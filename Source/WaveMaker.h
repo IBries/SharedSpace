@@ -59,8 +59,8 @@ private:
 	WavAudioFormat* wavFormat;
 	int outputSampleRate;
 	void outputThumbnailChanged();
-	void paintIfNoFileLoaded(Graphics&, const Rectangle<int>&);
-	void paintIfFileLoaded(Graphics&, const Rectangle<int>&);
+	void paintIfNoFileLoaded(Graphics&, const juce::Rectangle<int>&);
+	void paintIfFileLoaded(Graphics&, const juce::Rectangle<int>&);
 
 	void createAndDisplayOutput();
 	void writeOutputToDisk();

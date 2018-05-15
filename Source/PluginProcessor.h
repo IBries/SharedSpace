@@ -11,6 +11,9 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "SampleSound.h"
+#include "SampleVoice.h"
+#include "InputStage.h"
 
 //==============================================================================
 /**
@@ -57,6 +60,7 @@ public:
 
 private:
 	Synthesiser synth;
+	SampleVoice* voice;
 
 	double lastSampleRate;
 

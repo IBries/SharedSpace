@@ -10,9 +10,6 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "SampleSound.h"
-#include "SampleVoice.h"
-#include "InputStage.h"
 
 //==============================================================================
 SharedSpaceAudioProcessor::SharedSpaceAudioProcessor()
@@ -171,7 +168,7 @@ void SharedSpaceAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 {
 	buffer.clear();
 
-	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumChannels());
+	synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
 //==============================================================================

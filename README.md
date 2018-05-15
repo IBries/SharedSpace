@@ -17,10 +17,11 @@ channels (i.e. mono/stereo). The convolution is displayed in the output containe
 
 ## Current Features
 * Input/Output waveform displays
+* Accepts MIDI messages (but they don't do anything right now)
 
 ## Future Features
 * Actual sound!
-* MIDI support
+* Improved MIDI support
 * Filtering
 * Envolope Generator(s)
 * LFO(s)
