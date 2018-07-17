@@ -8,7 +8,9 @@
 > a convolutional sampler
 
 Shared Space is (will be) a full-featured sampler, with a twist. The only sound
-source available is the convolution of two user-supplied .wav files.
+source available is the convolution of two user-supplied .wav files. Currently, the
+JUCE convolution algorithm does not have the performance to do real-time calculations
+of longer (>1s signals). Progress is halted until I find a better convolution algorithm.
 
 ## Getting started
 
